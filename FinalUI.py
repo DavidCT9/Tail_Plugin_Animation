@@ -3,9 +3,9 @@ import math
 
 class M_Window(object):
     def __init__(self):
-        self.window = "M_Window"  # nombre de la clase
-        self.title = "Boss Animation Plugin"  # nombre de la ventana
-        self.size = (300, 400)
+        self.window = "M_Window"  
+        self.title = "Boss Animation Plugin"  
+        self.size = (350, 500)
         self.amountJoints = 0
         self.yGap = 5
         self.height = 0
@@ -15,62 +15,84 @@ class M_Window(object):
             cmds.deleteUI(self.window, window=True)
 
         self.window = cmds.window(self.window, title=self.title, widthHeight=self.size)
-        cmds.columnLayout()
+        self.form = cmds.formLayout()
+        self.scroll = cmds.scrollLayout(horizontalScrollBarThickness=16, verticalScrollBarThickness=16)
+        self.column = cmds.columnLayout(adjustableColumn=True, parent=self.scroll)
 
-        self.valueJoints = cmds.text(l="Number of Joints")
-        self.valJoints = cmds.intField(minValue=0, maxValue=100, value=0)
-        cmds.rowLayout(numberOfColumns=2, columnWidth2=(100, 100), columnOffset2=(10, 10))
-        self.CreateJoints = cmds.button(l="Generate Joints", c=self.createJoints)
-        self.GenerateMaya = cmds.button(l="Generate Maya", c=self.createMaya)
+        cmds.text(label="Joint Settings", align='center', font='boldLabelFont')
+        self.valueJoints = cmds.text(l="Number of Joints", align='center')
+        self.valJoints = cmds.intField(minValue=0, maxValue=100, value=0, step=1)
+
+        cmds.rowLayout(numberOfColumns=2, adjustableColumn=2, columnAlign=(1, 'center'), columnAttach=[(1, 'both', 5), (2, 'both', 5)])
+        self.CreateJoints = cmds.button(l="Generate Joints", c=self.createJoints, bgc=(0.6, 0.8, 0.6))
+        self.GenerateMaya = cmds.button(l="Generate Maya", c=self.createMaya, bgc=(0.6, 0.8, 0.6))
         cmds.setParent('..')
+
+        cmds.separator(height=20, style='double')
 
         # ATTACK ANIMATION ################################################################################
-        cmds.separator(height=10, style='none')
-        cmds.rowLayout(numberOfColumns=2, columnWidth2=(100, 100), columnOffset2=(10, 10))
-        self.attackFrames = cmds.text(l="Initial Frame")
-        self.attackFrames = cmds.text(l="Last Frame")
+        cmds.text(label="Attack Animation", align='center', font='boldLabelFont')
+        cmds.rowLayout(numberOfColumns=2, adjustableColumn=2, columnAlign=(1, 'center'), columnAttach=[(1, 'both', 5), (2, 'both', 5)])
+        self.attackFrames = cmds.text(l="Initial Frame", align='center')
+        self.attackInitialFrame = cmds.intField(minValue=0, maxValue=500, value=0, step=1)
         cmds.setParent('..')
-        cmds.rowLayout(numberOfColumns=2, columnWidth2=(100, 100), columnOffset2=(10, 10))
-        self.attackInitialFrame = cmds.intField(minValue=0, maxValue=500, value=0)
-        self.attackLastFrame = cmds.intField(minValue=0, maxValue=500, value=0)
+        cmds.rowLayout(numberOfColumns=2, adjustableColumn=2, columnAlign=(1, 'center'), columnAttach=[(1, 'both', 5), (2, 'both', 5)])
+        self.attackFrames = cmds.text(l="Last Frame", align='center')
+        self.attackLastFrame = cmds.intField(minValue=0, maxValue=500, value=0, step=1)
         cmds.setParent('..')
-        self.createAttackAnimation = cmds.button(l="Generate Attack Animation", c=self.createAttackAnimation)
-        # IDLE ANIMATION ################################################################################
-        cmds.separator(height=10, style='none')
-        cmds.rowLayout(numberOfColumns=2, columnWidth2=(100, 100), columnOffset2=(10, 10))
-        self.idleFrames = cmds.text(l="Initial Frame")
-        self.idleFrames = cmds.text(l="Last Frame")
-        cmds.setParent('..')
-        cmds.rowLayout(numberOfColumns=2, columnWidth2=(100, 100), columnOffset2=(10, 10))
-        self.idleInitialFrame = cmds.intField(minValue=0, maxValue=500, value=0)
-        self.idleLastFrame = cmds.intField(minValue=0, maxValue=500, value=0)
-        cmds.setParent('..')
-        self.createIdleAnimation = cmds.button(l="Generate Idle Animation", c=self.createIdleAnimation)
-        # FIGHT ANIMATION ################################################################################
-        cmds.separator(height=10, style='none')
-        cmds.rowLayout(numberOfColumns=2, columnWidth2=(100, 100), columnOffset2=(10, 10))
-        self.fightFrames = cmds.text(l="Initial Frame")
-        self.fightFrames = cmds.text(l="Last Frame")
-        cmds.setParent('..')
-        cmds.rowLayout(numberOfColumns=2, columnWidth2=(100, 100), columnOffset2=(10, 10))
-        self.fightInitialFrame = cmds.intField(minValue=0, maxValue=500, value=0)
-        self.fightLastFrame = cmds.intField(minValue=0, maxValue=500, value=0)
-        cmds.setParent('..')
-        self.createFightAnimation = cmds.button(l="Generate Fight Animation", c=self.createFightAnimation)
-        # DEFENSE ANIMATION ################################################################################
-        cmds.separator(height=10, style='none')
-        cmds.rowLayout(numberOfColumns=2, columnWidth2=(100, 100), columnOffset2=(10, 10))
-        self.defenseFrames = cmds.text(l="Initial Frame")
-        self.defenseFrames = cmds.text(l="Last Frame")
-        cmds.setParent('..')
-        cmds.rowLayout(numberOfColumns=2, columnWidth2=(100, 100), columnOffset2=(10, 10))
-        self.defenseInitialFrame = cmds.intField(minValue=0, maxValue=500, value=0)
-        self.defenseLastFrame = cmds.intField(minValue=0, maxValue=500, value=0)
-        cmds.setParent('..')
-        self.createDefenseAnimation = cmds.button(l="Generate Defense Animation", c=self.createDefenseAnimation)
+        self.createAttackAnimation = cmds.button(l="Generate Attack Animation", c=self.createAttackAnimation, bgc=(0.8, 0.6, 0.6))
+        
+        cmds.separator(height=20, style='double')
 
-        cmds.separator(height=10, style='none')
-        self.DeleteAll = cmds.button(l="Delete All", c=self.deleteAll)
+        # IDLE ANIMATION ################################################################################
+        cmds.text(label="Idle Animation", align='center', font='boldLabelFont')
+        cmds.rowLayout(numberOfColumns=2, adjustableColumn=2, columnAlign=(1, 'center'), columnAttach=[(1, 'both', 5), (2, 'both', 5)])
+        self.idleFrames = cmds.text(l="Initial Frame", align='center')
+        self.idleInitialFrame = cmds.intField(minValue=0, maxValue=500, value=0, step=1)
+        cmds.setParent('..')
+        cmds.rowLayout(numberOfColumns=2, adjustableColumn=2, columnAlign=(1, 'center'), columnAttach=[(1, 'both', 5), (2, 'both', 5)])
+        self.idleFrames = cmds.text(l="Last Frame", align='center')
+        self.idleLastFrame = cmds.intField(minValue=0, maxValue=500, value=0, step=1)
+        cmds.setParent('..')
+        self.createIdleAnimation = cmds.button(l="Generate Idle Animation", c=self.createIdleAnimation, bgc=(0.6, 0.6, 0.8))
+        
+        cmds.separator(height=20, style='double')
+
+        # FIGHT ANIMATION ################################################################################
+        cmds.text(label="Fight Animation", align='center', font='boldLabelFont')
+        cmds.rowLayout(numberOfColumns=2, adjustableColumn=2, columnAlign=(1, 'center'), columnAttach=[(1, 'both', 5), (2, 'both', 5)])
+        self.fightFrames = cmds.text(l="Initial Frame", align='center')
+        self.fightInitialFrame = cmds.intField(minValue=0, maxValue=500, value=0, step=1)
+        cmds.setParent('..')
+        cmds.rowLayout(numberOfColumns=2, adjustableColumn=2, columnAlign=(1, 'center'), columnAttach=[(1, 'both', 5), (2, 'both', 5)])
+        self.fightFrames = cmds.text(l="Last Frame", align='center')
+        self.fightLastFrame = cmds.intField(minValue=0, maxValue=500, value=0, step=1)
+        cmds.setParent('..')
+        self.createFightAnimation = cmds.button(l="Generate Fight Animation", c=self.createFightAnimation, bgc=(0.8, 0.8, 0.6))
+
+        cmds.separator(height=20, style='double')
+
+        # DEFENSE ANIMATION ################################################################################
+        cmds.text(label="Defense Animation", align='center', font='boldLabelFont')
+        cmds.rowLayout(numberOfColumns=2, adjustableColumn=2, columnAlign=(1, 'center'), columnAttach=[(1, 'both', 5), (2, 'both', 5)])
+        self.defenseFrames = cmds.text(l="Initial Frame", align='center')
+        self.defenseInitialFrame = cmds.intField(minValue=0, maxValue=500, value=0, step=1)
+        cmds.setParent('..')
+        cmds.rowLayout(numberOfColumns=2, adjustableColumn=2, columnAlign=(1, 'center'), columnAttach=[(1, 'both', 5), (2, 'both', 5)])
+        self.defenseFrames = cmds.text(l="Last Frame", align='center')
+        self.defenseLastFrame = cmds.intField(minValue=0, maxValue=500, value=0, step=1)
+        cmds.setParent('..')
+        self.createDefenseAnimation = cmds.button(l="Generate Defense Animation", c=self.createDefenseAnimation, bgc=(0.6, 0.8, 0.8))
+
+        cmds.separator(height=20, style='double')
+
+        self.DeleteAll = cmds.button(l="Delete All", c=self.deleteAll, bgc=(0.9, 0.4, 0.4))
+
+        cmds.setParent('..')
+        cmds.setParent('..')
+        
+        cmds.formLayout(self.form, edit=True, attachForm=[(self.scroll, 'top', 0), (self.scroll, 'bottom', 0), (self.scroll, 'left', 0), (self.scroll, 'right', 0)])
+
         cmds.showWindow()  # muestra la ventana
 
     def createJoints(self, *args):
@@ -159,9 +181,9 @@ class M_Window(object):
         
         for i in range(initialFrame, lastFrame):
             for j in range(1, self.amountJoints):
-                curl_amount = (math.pi * i * 3/4)  / self.amountJoints
-                shake_amount = math.sin((8 * math.pi * i) / (lastFrame - initialFrame) + j)  
-                cmds.setKeyframe("joint" + str(j + 1), at="rotateX", v=curl_amount, t=i/5)
+                curl_amount = (math.pi * i * 3/4) / self.amountJoints
+                shake_amount = math.sin((8 * math.pi * i) / (lastFrame - initialFrame) + j)
+                cmds.setKeyframe("joint" + str(j + 1), at="rotateX", v=curl_amount, t=i / 5)
                 cmds.setKeyframe("joint" + str(j + 1), at="translateX", v=shake_amount, t=i)
 
         print("Defense animation applied")
